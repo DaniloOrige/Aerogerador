@@ -20,8 +20,35 @@ beta = 0; % [rad] Ângulo de pitch das pás
 
 Ea = 5;  % [V]
 U = 30; % [m/s] 
+w = 1;
+
+%%
+%---------------QUESTÃO 0.1--------------------------------------
+
+lambdavec = linspace(0, 15, 100); 
+% Com beta = 0
+beta0 = 0;
+%Cp = zeros(length(lambdavec), length(beta));
+Cp0 = (0.44 - 0.167*beta0).*sin(pi*lambdavec./(15 - 0.3*beta0)) - 0.16*lambdavec*beta0;
+
+beta5 = 0.1;
+%Cp = zeros(length(lambdavec), length(beta));
+Cp5 = (0.44 - 0.167*beta5).*sin(pi*lambdavec./(15 - 0.3*beta5)) - 0.16*lambdavec*beta5;
+
+beta10 = 0.2;
+%Cp = zeros(length(lambdavec), length(beta));
+Cp10 = (0.44 - 0.167*beta10).*sin(pi*lambdavec./(15 - 0.3*beta10)) - 0.16*lambdavec*beta10;
+
+% Plot
+plot(lambdavec, Cp0, 'r', lambdavec, Cp5, 'b', lambdavec, Cp10, 'g')
+legend('0°', '0.1°', '0.2°')
+xlabel('\lambda (razão de velocidade de ponta)')
+ylabel('C_p (coeficiente de potência)')
+title('Análise de Beta')
+grid on
 
 
+%%
 %lambda = R*w/U;
 %Cp = (0.44 - 0.167*beta)*sin((pi*lambda)/(15 - 0.3*beta)) - 0.16*lambda*beta;
 funCp = @(lambda, beta)((0.44 - 0.167*beta)*sin((pi*lambda)/(15 - 0.3*beta)) - 0.16*lambda*beta);

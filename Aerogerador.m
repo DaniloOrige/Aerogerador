@@ -18,10 +18,39 @@ beta = 0; % [rad] Ângulo de pitch das pás
 
 % Valores hipotéticos
 
-Ea = 5;  % [V]
-U = 30; % [m/s] 
+Ea = 500;  % [V]
+U = 10; % [m/s] 
+w = 1;
+
+%%
+%---------------QUESTÃO 0.1--------------------------------------
+
+% Intervalo de lambda
+
+lambda = linspace(0, 15, 100);
+betas = [0, 0.2, 0.5];
+Cp = zeros(length(lambda), length(betas));
 
 
+for i = 1:length(betas) % Calcular Cp para cada beta
+    beta = betas(i);
+    Cp(:, i) = (0.44 - 0.167*beta).*sin(pi*lambda./(15 - 0.3*beta)) - 0.16*lambda*beta;
+end
+
+figure;
+plot(lambda, Cp, 'LineWidth', 1.8);
+grid on;
+
+xlabel('\lambda (razão de velocidade de ponta)');
+ylabel('C_p (coeficiente de potência)');
+title('Curvas de C_p(\lambda, \beta)');
+
+
+legend(arrayfun(@(b) sprintf('\\beta = %.1f', b), betas, 'UniformOutput', false), ...
+       'Location', 'best');
+
+
+%%
 %lambda = R*w/U;
 %Cp = (0.44 - 0.167*beta)*sin((pi*lambda)/(15 - 0.3*beta)) - 0.16*lambda*beta;
 funCp = @(lambda, beta)((0.44 - 0.167*beta)*sin((pi*lambda)/(15 - 0.3*beta)) - 0.16*lambda*beta);
