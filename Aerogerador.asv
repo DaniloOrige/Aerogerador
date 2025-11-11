@@ -2,50 +2,50 @@ clear all
 close all
 clc
 
-%% PARAMETRIZAÇÃO %%
-% Parametrização de aerogerador de 4.2MW
+%% PARAMETRIZAÃ‡ÃƒO %%
+% ParametrizaÃ§Ã£o de aerogerador de 4.2MW
 
 kv = 900; % [V/(rad/s)] Constante de velocidade
 kt = kv; % [V/(rad/s)] Constante de torque
-Ra = 100e-3; % [Ohm] Resistência de armadura 
-La = 108e-3; % [H] Indutância de armadura
-J = 9e6; % [kgm^2] Momento de inércia do rotor
+Ra = 100e-3; % [Ohm] ResistÃªncia de armadura 
+La = 108e-3; % [H] IndutÃ¢ncia de armadura
+J = 9e6; % [kgm^2] Momento de inÃ©rcia do rotor
 R = 73.5; % [m] Raio do rotor
-ro = 1.2; % [kg/m^3] Densidade do ar
+rho = 1.2; % [kg/m^3] Densidade do ar
 b = 46e3; % [Nm/(rad/s)] Coeficiente de atrito total
-A = pi*R^2; % [m^2] Área seção transversal do rotor
-beta = 0; % [rad] Ângulo de pitch das pás
+A = pi*R^2; % [m^2] Ã?rea seÃ§Ã£o transversal do rotor
+beta = 0; % [rad] Ã‚ngulo de pitch das pÃ¡s
 
-% Valores hipotéticos
+% Valores hipotÃ©ticos
 
-Ea = 5;  % [V]
-U = 30; % [m/s] 
-w = 1;
-
+Ea = 500;  % [V]
+U = 10; % [m/s] 
 %%
 %---------------QUESTÃO 0.1--------------------------------------
 
-lambdavec = linspace(0, 15, 100); 
-% Com beta = 0
-beta0 = 0;
-%Cp = zeros(length(lambdavec), length(beta));
-Cp0 = (0.44 - 0.167*beta0).*sin(pi*lambdavec./(15 - 0.3*beta0)) - 0.16*lambdavec*beta0;
+% Intervalo de lambda
 
-beta5 = 0.1;
-%Cp = zeros(length(lambdavec), length(beta));
-Cp5 = (0.44 - 0.167*beta5).*sin(pi*lambdavec./(15 - 0.3*beta5)) - 0.16*lambdavec*beta5;
+lambda = linspace(0, 15, 100);
+betas = [0, 0.2, 0.5];
+Cp = zeros(length(lambda), length(betas));
 
-beta10 = 0.2;
-%Cp = zeros(length(lambdavec), length(beta));
-Cp10 = (0.44 - 0.167*beta10).*sin(pi*lambdavec./(15 - 0.3*beta10)) - 0.16*lambdavec*beta10;
 
-% Plot
-plot(lambdavec, Cp0, 'r', lambdavec, Cp5, 'b', lambdavec, Cp10, 'g')
-legend('0°', '0.1°', '0.2°')
-xlabel('\lambda (razão de velocidade de ponta)')
-ylabel('C_p (coeficiente de potência)')
-title('Análise de Beta')
-grid on
+for i = 1:length(betas) % Calcular Cp para cada beta
+    beta = betas(i);
+    Cp(:, i) = (0.44 - 0.167*beta).*sin(pi*lambda./(15 - 0.3*beta)) - 0.16*lambda*beta;
+end
+
+figure;
+plot(lambda, Cp, 'LineWidth', 1);
+grid on;
+
+xlabel('\lambda (razão de velocidade de ponta)');
+ylabel('C_p (coeficiente de potência)');
+title('Curvas de C_p(\lambda, \beta)');
+
+
+legend(arrayfun(@(b) sprintf('\\beta = %.1f', b), betas, 'UniformOutput', false), ...
+       'Location', 'best');
 
 
 %%
@@ -53,7 +53,7 @@ grid on
 %Cp = (0.44 - 0.167*beta)*sin((pi*lambda)/(15 - 0.3*beta)) - 0.16*lambda*beta;
 funCp = @(lambda, beta)((0.44 - 0.167*beta)*sin((pi*lambda)/(15 - 0.3*beta)) - 0.16*lambda*beta);
 
-Pw = 0.5*ro*A*U^3;
+Pw = 0.5*rho*A*U^3;
 
 % Pm = tau*w = Cp*Pw
 % tau = Cp*Pw/w
@@ -61,12 +61,12 @@ Pw = 0.5*ro*A*U^3;
 
 funTau = @(w) ((funCp(R*w/U, beta) * Pw)/w);
 
-% ./w  ao inves de /w faria multiplicação elemento a elemento? perguntar
+% ./w  ao inves de /w faria multiplicaÃ§Ã£o elemento a elemento? perguntar
 % pro lelis
-% .* é o equivalente para multiplicação
+% .* Ã© o equivalente para multiplicaÃ§Ã£o
 
 
-%%  Equilíbrio %% 
+%%  EquilÃ­brio %% 
 % Feito substituindo uma edo na outra e removendo dependencia de ia em w
 w0 = 1;   % CI 
 % se CI = 0 da erro porque tau/0
@@ -79,24 +79,50 @@ ia = (kv*w - Ea)/Ra;
 
 
 
+%% 
+%-----------------------QUESTÃO 4----------------------------------
 
+Ppe = Ra*ia^2; % Perdas elÃ©tricas
+
+Ppm = b*w^2; % Perdas mecÃ¢nicas
+
+Pg = Ea*ia; % PotÃªncia gerada
+
+Pe = funTau(w)*w; % Potência injetada
+
+%% 
+%-----------------------QUESTÃO 5----------------------------------
+
+x0 = [10; 2; 1; 2];
+x = fsolve(@(x) funNominal(x, rho, A, b, kv, R, Ra), x0);
+
+
+%%
+%-----------------------QUESTÃO 9----------------------------------
 % DINAMICA
-% [tvec,yvec] = ode45(@(t, y) funOmega(J, tau, b, y, kv, ia),[0 10*60],[0 0]);
-% 
-% 
-% [t2vec,xvec] = ode45(@(t, x) funIa(La, kv, w, Ra, Ea, x),[0 10*60],[0 0]);
-% 
-% iavec = xvec(:, 1);
 
-%% Item 4 %%
+[tvec, xvec] = ode45(@(t,x) funDin_aerogerador(J, funTau, b, La, Ra, Ea, kv, x), [0 10], [0 1]);
+iavec = xvec(:,1);
+wvec = xvec(:,2);
 
-%Ppe = Ra*ia^2; % Perdas elétricas
+% Plot dinâmica
 
-%Ppm = b*w^2; % Perdas mecânicas
+subplot(2,1,1)
+plot(tvec, iavec, 'r', 'LineWidth', 1)
+xlabel('Tempo [s]')
+ylabel('Corrente [A]')
+grid on
 
-%Pg = Ea*ia; % Potência gerada
+subplot(2,1,2)
+plot(tvec, wvec, 'b', 'LineWidth', 1)
+xlabel('Tempo [s]')
+ylabel('Velocidade de rotação [rad/s]')
+grid on
 
-%Pe = tau*w; % potencia injetada?
+sgtitle('Dinâmica das Variáveis de Estado', 'FontWeight', 'bold', ...
+    'FontSize', 12)
+
+
 
 
 
