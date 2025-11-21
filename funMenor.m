@@ -1,17 +1,13 @@
-function F = funNominal(x, rho, A, b, kv, R, Ra, Pnom, lambdaopt, Cpmax)
+function F = funMenor (x, rho, A, b, kv, R, Ra, U, lambdaopt, Cpmax)
 
-U = x(1);
+Ea = x(1);
 ia = x(2);
 
 Pw = 0.5*rho*A*U^3;
 
 w = (U*lambdaopt)/R;
-Ea = Pnom/ia;
 
 eq1 = (Cpmax * Pw)/w - b*w - kv*ia; 
 eq2 = kv*w - Ea - Ra*ia;
  
  F = [eq1; eq2];
-
-
-
