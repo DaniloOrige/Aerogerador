@@ -175,7 +175,8 @@ for k = 1:length(Uvec_maior)
 
 end
 
-% Plot 2
+
+% Plot 2 
 
 figure;
 subplot(2,1,1);
@@ -221,12 +222,158 @@ sgtitle('Dinâmica das Variáveis de Estado', 'FontWeight', 'bold', ...
 
 %%
 %-----------------------QUESTÃO 10----------------------------------
+% 
+
+w_10a = out.questao10a;
+w_ref10a = out.wref_10a;
+u_10a = out.controle10a;
+q_10a= out.perturbacao10a;
+
+
+w_10b = out.questao10b;
+w_ref10b = out.w_ref10b;
+u_10b = out.controle10b;
+q_10b = out.perturbacao10b;
+
+t_simulink = out.tout;
+
+
+% Plot questão 10a
+
+
+figure;
+subplot(3,1,1)
+plot(t_simulink, w_10a, 'g', 'LineWidth', 1.5)
+xlabel('Tempo [s]')
+ylabel('Velocidade angular das pás [rad/s]')
+grid on
+hold on
+plot(t_simulink, w_ref10a, 'Color' ,'#FF0000', 'LineWidth', 2.0, 'LineStyle','--');
+legend('Resposta do sistema', 'Refência')
+
+subplot(3,1,2)
+plot(t_simulink, u_10a, 'b', 'LineWidth', 1.5)
+xlabel('Tempo [s]')
+ylabel('Entrada de controle')
+grid on
+
+subplot(3,1,3)
+plot(t_simulink, q_10a, 'm', 'LineWidth', 1.5)
+xlabel('Tempo [s]')
+ylabel('Velocidade do vento [m/s]')
+grid on
+sgtitle('Ensaio resposta ao degrau com U = Unominal e referência variável', 'FontWeight', 'bold', ...
+    'FontSize', 12)
+
+
+figure;
+subplot(3,1,1)
+plot(t_simulink, w_10b, 'Color', '#F1C338', 'LineWidth', 1.5)
+xlabel('Tempo [s]')
+ylabel('Velocidade angular das pás [rad/s]')
+grid on
+hold on
+plot(t_simulink, w_ref10b,'Color' ,'#FF00FF', 'LineWidth', 2.0, 'LineStyle','--');
+legend('Resposta do sistema', 'Refência')
+
+subplot(3,1,2)
+plot(t_simulink, u_10b, 'b', 'LineWidth', 1.5)
+xlabel('Tempo [s]')
+ylabel('Entrada de controle')
+grid on
+
+subplot(3,1,3)
+plot(t_simulink, q_10b, 'm', 'LineWidth', 1.5)
+xlabel('Tempo [s]')
+ylabel('Velocidade do vento [m/s]')
+grid on
+
+
+
+sgtitle('Ensaio de resposta ao degrau com referência', 'FontWeight', 'bold', ...
+    'FontSize', 12)
+%%
+%-----------------------QUESTÃO 11----------------------------------
+% 
+% Uvec = (3:20)';
+% vectempo = (0:4.5:76.5)';
+% 
+% dadosts = timeseries(vectempo, Uvec);
+% dados_ts.UserData.Interpolation = 'zoh';
+% 
+% stairs(vectempo, Uvec, 'r', 'LineWidth', 1.5)
+% 
+% xlabel('Tempo [s]')
+% ylabel('Vento [m/s]')
+% grid on
+
+vecU11 = linspace(3, 20, 18);
+vecU11 = [3, vecU11];
+vecstepinterval = zeros(1, length(vecU11));
+
+for k = 1:length(vecU11) - 1
+    vecstepinterval(k + 1) = 8*k;
+end
+
+w11 = out.w11;
+tout = out.tout;
+Ea11 = out.Ea11;
+beta11 = out.beta11;
+q11 = out.perturbacao11;
+w_ref11 = out.w_ref11;
+Pentregue11 = out.potencia11;
+ia11 = out.ia11;
+
+
+figure;
+subplot(2,1,1)
+plot(tout, w11, 'Color', '#FF0000', 'LineWidth', 1.5)
+xlabel('Tempo [s]')
+ylabel('Velocidade angular nas pás [rad/s]')
+grid on
+hold on
+plot(tout, w_ref11, 'g', 'LineWidth', 1.5, 'LineStyle', ':')
+
+subplot(2,1,2)
+plot(tout, Ea11, 'Color', '#FF0000', 'LineWidth', 1.5)
+xlabel('Tempo [s]')
+ylabel('Entradas de controle')
+grid on 
+hold on
+plot(tout, beta11*(180/pi)*100, 'Color', '#FF5C00', 'LineWidth', 1.5)
+
+
+vecPpe11 = ones(size(tout));
+vecPpm11 = ones(size(tout));
+vecPg11 = ones(size(tout));
+
+
+
+Ppe11 = ((ia11 .* ia11) * Ra); % Perdas elétricas
+
+Ppm11 = (b* (w11 .* w11)); % Perdas mecânicas
+ 
+Pg11 = (kv*ia11.*w11); % Potência gerada
+
+Pe11 = Pg11 - Ppe11 - Ppm11; % Potência entregue
+ 
+
+figure;
+grid on 
+hold on
+xlabel('Tempo [s]')
+ylabel('Potências do sistema [W]')
+plot(tout, Ppe11, 'Color', '#FFF700', 'LineWidth', 2.0,'DisplayName', 'Perdas Elétricas')
+plot(tout, Ppm11, 'Color', '#FF5C00', 'LineWidth', 2.0, 'DisplayName', 'Perdas Mecânicas')
+plot(tout, Pg11, 'Color', '#50C878', 'LineWidth', 2.0, 'DisplayName', 'Potência Gerada')
+plot(tout, Pentregue11, 'Color', '#D20A2E', 'LineWidth', 2.0, 'DisplayName', 'Potência Entregue')
+legend show;
+
+
+ 
 
 
 %%
-
-
-
 
 
 
